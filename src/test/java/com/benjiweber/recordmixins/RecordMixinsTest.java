@@ -2,7 +2,9 @@ package com.benjiweber.recordmixins;
 
 import org.junit.Test;
 
-import java.lang.reflect.Constructor;
+import java.io.Serializable;
+import java.lang.invoke.SerializedLambda;
+import java.lang.reflect.*;
 import java.util.*;
 import java.util.function.*;
 import java.util.stream.Collectors;
@@ -11,7 +13,7 @@ import java.util.stream.Stream;
 import static java.util.stream.Collectors.toList;
 import static org.junit.Assert.*;
 
-public class RecordMixins {
+public class RecordMixinsTest {
 
     private static final List<String> example = List.of("one", "two", "three", "four", "five");
 
@@ -61,6 +63,7 @@ public class RecordMixins {
                 .where(s -> s.endsWith("e"))
         );
     }
+
 
     public record EnhancedList<T>(List<T> inner) implements
             ForwardingList<T>,
