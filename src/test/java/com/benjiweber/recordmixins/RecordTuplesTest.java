@@ -15,6 +15,10 @@ import static org.junit.Assert.assertEquals;
 
 public class RecordTuplesTest {
 
+    public record Colour(int red, int green, int blue) implements TriTuple<Colour,Integer,Integer,Integer> {}
+    public record Person(String name, int age, double height) implements TriTuple<Person, String, Integer, Double> {}
+    public record Town(int population, int altitude, int established) implements TriTuple<Town, Integer, Integer, Integer> { }
+
     @Test
     public void decomposable_record() {
         Colour colour = new Colour(1,2,3);
@@ -61,36 +65,6 @@ public class RecordTuplesTest {
             .with(Person::height, 83.2);
 
         assertEquals(new Person("Sam", 34, 83.2), sam);
-    }
-
-
-    public record Colour(int red, int green, int blue) implements TriTuple<Colour,Integer,Integer,Integer> {}
-    public record Person(String name, int age, double height) implements TriTuple<Person, String, Integer, Double> {}
-    public record Town(int population, int altitude, int established) implements TriTuple<Town, Integer, Integer, Integer> { }
-
-    public interface MethodAwareFunction<T,R> extends Function<T,R>, MethodFinder { }
-
-    interface TriFunction<T,U,V,R> {
-        R apply(T t, U u, V v);
-    }
-
-    interface TriConsumer<T,U,V> {
-        void apply(T t, U u, V v);
-    }
-
-    interface PrimitiveMappings {
-        Map<Class<?>, Object> defaultValues = Map.of(
-                int.class, 0,
-                double.class, 0.0
-        );
-
-        Map<Class<?>, Class<?>> boxingMappings = Map.of(
-                Integer.class, int.class,
-                int.class, Integer.class,
-                Double.class, double.class,
-                double.class, Double.class
-        );
-
     }
 
     interface TriTuple<TRecord extends Record & TriTuple<TRecord, T, U, V>,T,U,V> extends DecomposableRecord, PrimitiveMappings {
@@ -249,6 +223,33 @@ public class RecordTuplesTest {
             }
         }
 
+
+    }
+
+
+
+    public interface MethodAwareFunction<T,R> extends Function<T,R>, MethodFinder { }
+
+    interface TriFunction<T,U,V,R> {
+        R apply(T t, U u, V v);
+    }
+
+    interface TriConsumer<T,U,V> {
+        void apply(T t, U u, V v);
+    }
+
+    interface PrimitiveMappings {
+        Map<Class<?>, Object> defaultValues = Map.of(
+                int.class, 0,
+                double.class, 0.0
+        );
+
+        Map<Class<?>, Class<?>> boxingMappings = Map.of(
+                Integer.class, int.class,
+                int.class, Integer.class,
+                Double.class, double.class,
+                double.class, Double.class
+        );
 
     }
 
