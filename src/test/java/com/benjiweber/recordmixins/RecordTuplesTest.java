@@ -11,6 +11,7 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+import static com.benjiweber.recordmixins.RecordTuplesTest.TriTuple.builder;
 import static org.junit.Assert.assertEquals;
 
 public class RecordTuplesTest {
@@ -22,10 +23,6 @@ public class RecordTuplesTest {
     @Test
     public void decomposable_record() {
         Colour colour = new Colour(1,2,3);
-
-        assertEquals(colour.red(), colour.one().intValue());
-        assertEquals(colour.green(), colour.two().intValue());
-        assertEquals(colour.blue(), colour.three().intValue());
 
         colour.decompose((r,g,b) -> {
             assertEquals(1, r.intValue());
@@ -59,7 +56,7 @@ public class RecordTuplesTest {
 
     @Test
     public void auto_builders() {
-        Person sam = TriTuple.builder(Person.class)
+        Person sam = builder(Person.class)
             .with(Person::name, "Sam")
             .with(Person::age, 34)
             .with(Person::height, 83.2);
