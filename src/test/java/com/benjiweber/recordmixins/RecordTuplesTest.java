@@ -44,6 +44,15 @@ public class RecordTuplesTest {
     }
 
     @Test
+    public void structural_convert_2() {
+        Colour colour = new Colour(1, 2, 3);
+        Town town = colour.to(Town::new);
+        assertEquals(1, town.population());
+        assertEquals(2, town.altitude());
+        assertEquals(3, town.established());
+    }
+
+    @Test
     public void replace_property() {
         Colour colour = new Colour(1,2,3);
         Colour changed = colour.with(Colour::red, 5);
@@ -94,6 +103,10 @@ public class RecordTuplesTest {
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
+        }
+
+        default <R extends Record & TriTuple<R, T, U, V>> R to(TriFunction<T, U, V, R> func) {
+            return func.apply(one(), two(), three());
         }
 
         default <R> TRecord with(MethodAwareFunction<TRecord, R> prop, R newValue) {
