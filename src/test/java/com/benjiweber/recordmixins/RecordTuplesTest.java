@@ -13,6 +13,7 @@ import java.util.stream.Stream;
 
 import static com.benjiweber.recordmixins.RecordTuplesTest.TriTuple.builder;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 public class RecordTuplesTest {
 
@@ -35,7 +36,7 @@ public class RecordTuplesTest {
     }
 
     @Test
-    public void structural_convert() {
+    public void structural_convert_reflection() {
         Colour colour = new Colour(1,2,3);
         Town town = colour.to(Town.class);
         assertEquals(1, town.population());
@@ -44,7 +45,7 @@ public class RecordTuplesTest {
     }
 
     @Test
-    public void structural_convert_2() {
+    public void structural_convert_method_reference() {
         Colour colour = new Colour(1, 2, 3);
         Town town = colour.to(Town::new);
         assertEquals(1, town.population());
