@@ -9,9 +9,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.benjiweber.recordmixins.RecordTuplesTest.TriTuple.builder;
+import static java.util.stream.Collectors.toList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
@@ -43,7 +45,6 @@ public class RecordTuplesTest {
         assertEquals(2, town.altitude());
         assertEquals(3, town.established());
     }
-
     @Test
     public void structural_convert_method_reference() {
         Colour colour = new Colour(1, 2, 3);
@@ -66,6 +67,15 @@ public class RecordTuplesTest {
 
     @Test
     public void auto_builders() {
+        Person sam = builder(Person::new)
+                .with(Person::name, "Sam")
+                .with(Person::age, 34)
+                .with(Person::height, 83.2);
+
+        assertEquals(new Person("Sam", 34, 83.2), sam);
+    }
+    @Test
+    public void auto_builders_reflection() {
         Person sam = builder(Person.class)
             .with(Person::name, "Sam")
             .with(Person::age, 34)
@@ -122,6 +132,18 @@ public class RecordTuplesTest {
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
+        }
+
+        static <T, U, V, TBuild extends Record & TriTuple<TBuild, T, U ,V>> TBuild builder(MethodAwareTriFunction<T,U,V,TBuild> ctor) {
+            var reflectedConstructor = ctor.getContainingClass().getConstructors()[0];
+            var defaultConstructorValues = Stream.of(reflectedConstructor.getParameterTypes())
+                    .map(defaultValues::get)
+                    .collect(toList());
+            return ctor.apply(
+                (T)defaultConstructorValues.get(0),
+                (U)defaultConstructorValues.get(1),
+                (V)defaultConstructorValues.get(2)
+            );
         }
 
         static <T, U, V, TBuild extends Record & TriTuple<TBuild, T, U ,V>> TBuild builder(Class<TBuild> cls) {
@@ -240,6 +262,7 @@ public class RecordTuplesTest {
 
 
     public interface MethodAwareFunction<T,R> extends Function<T,R>, MethodFinder { }
+    public interface MethodAwareTriFunction<T,U,V,R> extends TriFunction<T,U,V,R>, MethodFinder { }
 
     interface TriFunction<T,U,V,R> {
         R apply(T t, U u, V v);
