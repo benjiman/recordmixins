@@ -106,8 +106,8 @@ public class RecordTuplesTest {
             }
         }
 
-        default <R extends Record & TriTuple<R, T, U, V>> R to(TriFunction<T, U, V, R> func) {
-            return func.apply(one(), two(), three());
+        default <R extends Record & TriTuple<R, T, U, V>> R to(TriFunction<T, U, V, R> ctor) {
+            return decomposeTo(ctor);
         }
 
         default <R> TRecord with(MethodAwareFunction<TRecord, R> prop, R newValue) {
