@@ -24,7 +24,7 @@ public class DecomposeRecordsTest {
         AtomicReference<String> result = new AtomicReference<>("Fail");
         Name name = new Name("Benji", "Weber");
 
-        If.<String,String>instance(name, (first, last) -> {
+        If.instance(name, (String first, String last) -> {
             result.set(first.toLowerCase() + last.toLowerCase());
         });
 
@@ -36,7 +36,7 @@ public class DecomposeRecordsTest {
         AtomicReference<String> result = new AtomicReference<>("Nothing Happened");
         Nums nums = new Nums(5,6);
 
-        If.<String,String>instance(nums, (first, last) -> {
+        If.instance(nums, (String first, String last) -> {
             result.set(first.toLowerCase() + last.toLowerCase());
         });
 
@@ -47,7 +47,7 @@ public class DecomposeRecordsTest {
     public void decompose_matching_types_to_value() {
         Name name = new Name("Benji", "Weber");
 
-        String result = withFallback("Fail").If.<String,String>instance(name, (first, last) ->
+        String result = withFallback("Fail").If.instance(name, (String first, String last) ->
             first.toLowerCase() + last.toLowerCase()
         );
 
@@ -58,7 +58,7 @@ public class DecomposeRecordsTest {
     public void decompose_mismatching_types_to_value() {
         Nums nums = new Nums(5,6);
 
-        String result = withFallback("Nothing").If.<String,String>instance(nums, (first, last) ->
+        String result = withFallback("Nothing").If.instance(nums, (String first, String last) ->
                 first.toLowerCase() + last.toLowerCase()
         );
 
@@ -69,7 +69,7 @@ public class DecomposeRecordsTest {
     public void decompose_insufficient_arity_to_value() {
         Wrapper wrapper = new Wrapper("Benji");
 
-        String result = withFallback("Nothing").If.<String,String>instance(wrapper, (first, last) ->
+        String result = withFallback("Nothing").If.instance(wrapper, (String first, String last) ->
                 first.toLowerCase() + last.toLowerCase()
         );
 
@@ -80,7 +80,7 @@ public class DecomposeRecordsTest {
     public void decompose_surplus_arity_to_value() {
         NameWithMiddle name = new NameWithMiddle("Benji", "???", "Weber");
 
-        String result = withFallback("Fail").If.<String,String>instance(name, (first, middle) ->
+        String result = withFallback("Fail").If.instance(name, (String first, String middle) ->
                 first.toLowerCase() + middle.toLowerCase()
         );
 
@@ -92,7 +92,7 @@ public class DecomposeRecordsTest {
         AtomicReference<Integer> result = new AtomicReference<>(-1);
         Colour c = new Colour(5,6,7);
 
-        If.<Integer,Integer,Integer>instance(c, (r, g, b) -> {
+        If.instance(c, (Integer r, Integer g, Integer b) -> {
             result.set(r + g + b);
         });
 
@@ -103,7 +103,7 @@ public class DecomposeRecordsTest {
     public void decompose_matching_types_to_value_triple() {
         Colour c = new Colour(5,6,7);
 
-        int result = withFallback(-1).If.<Integer,Integer,Integer>instance(c, (r, g, b) ->
+        int result = withFallback(-1).If.instance(c, (Integer r, Integer g, Integer b) ->
             r + g + b
         );
 
@@ -115,7 +115,7 @@ public class DecomposeRecordsTest {
         AtomicReference<String> result = new AtomicReference<>("Nothing Happened");
         Colour c = new Colour(5,6,7);
 
-        If.<String,String,String>instance(c, (r, g, b) -> {
+        If.instance(c, (String r, String g, String b) -> {
             result.set(r.toLowerCase() + r.toLowerCase());
         });
 
@@ -126,8 +126,8 @@ public class DecomposeRecordsTest {
     public void decompose_mismatching_types_to_value_triple() {
         Colour c = new Colour(5,6,7);
 
-        String result = withFallback("Expected").If.<Integer,String,Integer>instance(c, (r, g, b) ->
-                r + g + b
+        String result = withFallback("Expected").If.instance(c, (Integer r, String g, Integer b) ->
+            r + g + b
         );
 
         assertEquals("Expected", result);
@@ -143,7 +143,7 @@ public class DecomposeRecordsTest {
 
         Zoo zoo = new Zoo(new Duck("Quack"), new Dog("Woof"));
 
-        String result = withFallback("Fail").If.<Animal,Animal>instance(zoo, (duck, dog) ->
+        String result = withFallback("Fail").If.instance(zoo, (Animal duck, Animal dog) ->
                 duck.noise() + dog.noise()
         );
 
@@ -160,7 +160,7 @@ public class DecomposeRecordsTest {
 
         Zoo zoo = new Zoo(new Duck("Quack"), new Dog("Woof"));
 
-        String result = withFallback("Fail").If.<Duck,Dog>instance(zoo, (duck, dog) ->
+        String result = withFallback("Fail").If.instance(zoo, (Duck duck, Dog dog) ->
                 duck.noise() + dog.noise()
         );
 
@@ -194,7 +194,7 @@ public class DecomposeRecordsTest {
 
         Zoo zoo = new Zoo(new Duck("Quack"), new Dog("Woof"));
 
-        String result = withFallback("Fail").If.<Dog,Duck>instance(zoo, (duck, dog) ->
+        String result = withFallback("Fail").If.instance(zoo, (Dog duck, Duck dog) ->
                 duck.noise() + dog.noise()
         );
 
