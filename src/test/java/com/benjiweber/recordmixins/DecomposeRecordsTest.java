@@ -168,6 +168,23 @@ public class DecomposeRecordsTest {
     }
 
     @Test
+    public void decompose_subtypes_infer_lhs() {
+        interface Animal { String noise(); }
+        record Duck(String noise) implements Animal {}
+        record Dog(String noise) implements Animal {}
+
+        record Zoo(Animal one, Animal two) {}
+
+        Zoo zoo = new Zoo(new Duck("Quack"), new Dog("Woof"));
+
+        String result = withFallback("Fail").If.instance(zoo, (Duck duck, Dog dog) ->
+                duck.noise() + dog.noise()
+        );
+
+        assertEquals("QuackWoof", result);
+    }
+
+    @Test
     public void decompose_mismatching_subtypes() {
         interface Animal { String noise(); }
         record Duck(String noise) implements Animal {}
