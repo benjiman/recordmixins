@@ -69,7 +69,12 @@ public class RecordMixinsTest {
             ForwardingList<T>,
             Mappable<T>,
             Filterable<T, EnhancedList<T>>,
-            Groupable<T> {}
+            Groupable<T> {
+        @Override
+        public EnhancedList<T> build(List<T> ts) {
+            return new EnhancedList<>(ts);
+        }
+    }
 
     public interface Mappable<T> extends Forwarding<List<T>> {
         default <R> List<R> map(Function<T, R> f) {
@@ -77,9 +82,13 @@ public class RecordMixinsTest {
         }
     }
 
-    public interface Filterable<T, R extends Collection<T>> extends ForwardingAllTheWayDown<List<T>, R> {
+    public interface Buildable<T, R> {
+        R build(T t);
+    }
+
+    public interface Filterable<T, R extends Collection<T>> extends Forwarding<List<T>>, Buildable<List<T>, R> {
         default R where(Predicate<T> p) {
-            return forwarding(inner().stream().filter(p).collect(toList()));
+            return build(inner().stream().filter(p).collect(toList()));
         }
     }
 
@@ -92,24 +101,6 @@ public class RecordMixinsTest {
 
     interface Forwarding<T> {
         T inner();
-    }
-
-    interface ForwardingAllTheWayDown<T, R> extends Forwarding<T> {
-        default R forwarding(T t) {
-            try {
-                return (R) compatibleConstructor(getClass().getConstructors(), t)
-                        .newInstance(t);
-            } catch (Exception e) {
-                throw new IllegalStateException(e);
-            }
-        }
-
-        default Constructor<?> compatibleConstructor(Constructor<?>[] constructors, T t) {
-            return Stream.of(constructors)
-                    .filter(ctor -> ctor.getParameterCount() == 1)
-                    .filter(ctor -> ctor.getParameters()[0].getType().isAssignableFrom(t.getClass()))
-                    .findAny().orElseThrow(IllegalStateException::new);
-        }
     }
 
     interface ForwardingList<T> extends List<T>, Forwarding<List<T>> {
