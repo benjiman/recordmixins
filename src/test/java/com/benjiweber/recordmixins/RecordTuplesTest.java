@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.benjiweber.recordmixins.RecordTuplesTest.TriTuple.builder;
+import static com.benjiweber.recordmixins.RecordTuplesTest.TriTuple.safebuilder;
 import static java.util.stream.Collectors.toList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -74,6 +75,17 @@ public class RecordTuplesTest {
 
         assertEquals(new Person("Sam", 34, 83.2), sam);
     }
+
+    @Test
+    public void mandatory_builders() {
+        Person sam = safebuilder(Person::new)
+                .with(Person::name, "Sam")
+                .with(Person::age, 34)
+                .with(Person::height, 83.2);
+
+        assertEquals(new Person("Sam", 34, 83.2), sam);
+    }
+
     @Test
     public void auto_builders_reflection() {
         Person sam = builder(Person.class)
@@ -132,6 +144,28 @@ public class RecordTuplesTest {
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
+        }
+
+        static <T, U, V, TBuild extends Record & TriTuple<TBuild, T, U ,V>> ThreeMissing<T,U,V,TBuild> safebuilder(MethodAwareTriFunction<T,U,V,TBuild> ctor) {
+            var reflectedConstructor = ctor.getContainingClass().getConstructors()[0];
+            var defaultConstructorValues = Stream.of(reflectedConstructor.getParameterTypes())
+                .map(defaultValues::get)
+                .collect(toList());
+            return (__, t) -> (___, u) -> (____, v)-> ctor.apply(
+                t,
+                u,
+                v
+            );
+        }
+
+        interface ThreeMissing<T,U,V, TRecord> {
+            TwoMissing<T,U,V, TRecord> with(MethodAwareFunction<TRecord, T> prop, T newValue);
+        }
+        interface TwoMissing<T,U,V, TRecord> {
+            OneMissing<T,U,V, TRecord> with(MethodAwareFunction<TRecord, U> prop, U newValue);
+        }
+        interface OneMissing<T,U,V, TRecord> {
+            TRecord with(MethodAwareFunction<TRecord, V> prop, V newValue);
         }
 
         static <T, U, V, TBuild extends Record & TriTuple<TBuild, T, U ,V>> TBuild builder(MethodAwareTriFunction<T,U,V,TBuild> ctor) {
